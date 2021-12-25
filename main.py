@@ -8,17 +8,19 @@ app = Flask(__name__)
 
 @app.route('/pay', methods=['POST'])
 def pay():
-    mRes = request.json
+    try:
+        mRes = request.json
+        print(type(mRes))
 
-    print(type(mRes))
+        rave = Rave("FLWPUBK_TEST-9b7e67b3f92743577a71e213ae831c30-X",
+                    "FLWSECK_TEST-d7c930ee491d6e2664ec55eba9d1082d-X", usingEnv=False)
 
-    rave = Rave("FLWPUBK_TEST-9b7e67b3f92743577a71e213ae831c30-X",
-                "FLWSECK_TEST-d7c930ee491d6e2664ec55eba9d1082d-X", usingEnv=False)
+        r = json.dumps(mRes)
+        payload = json.loads(r)
+        res = rave.Card.charge(payload)
+    except Exception as e:
+        print("An error occured: " + str(e))
 
-    # x = '{ "cardno" : "5531886652142950", "cvv" : "564", "currency" : "NGN", "country" : "NG", "expirymonth" : "09", "expiryyear" : "32", "amount" : "1000", "email" : "pr.mayami@gmail.com", "phonenumber" : "09039712085", "firstname" : "Joe", "lastname" : "Mayami"}'
-
-    r = json.dumps(mRes)
-    payload = json.loads(r)
-    res = rave.Card.charge(payload)
+        return ("An error occured: " + str(e))
 
     return str(res['txRef'])
